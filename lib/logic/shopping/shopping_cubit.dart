@@ -8,7 +8,7 @@ part 'shopping_state.dart';
 class ShoppingCubit extends Cubit<ShoppingState> {
   ShoppingCubit() : super(ShoppingInitial());
   static ShoppingCubit get(context) => BlocProvider.of(context);
-  static bool mode = true;
+  static bool mode = false;
 
   Future<void> changeThemeMode({bool? sharedTheme}) async {
     if (sharedTheme != null) {

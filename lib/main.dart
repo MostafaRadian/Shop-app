@@ -29,10 +29,11 @@ class MyApp extends StatelessWidget {
                 ShoppingCubit()..changeThemeMode(sharedTheme: isDark))
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         theme: lightTheme,
         darkTheme: darkTheme,
         themeMode: ShoppingCubit.mode ? ThemeMode.dark : ThemeMode.light,
-        home: const OnBoardingScreen(),
+        home: OnBoardingScreen(),
       ),
     );
   }
