@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shop_app/Screens/on_boarding/on_boarding.dart';
+import 'package:shop_app/Shared/services/api/dio_helper.dart';
 import 'package:shop_app/Shared/styles/themes.dart';
 
 import 'Shared/services/local/cache_helper.dart';
@@ -10,6 +11,7 @@ import 'logic/shopping/shopping_cubit.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = MyBlocObserver();
+  DioHelper.init();
   await CacheHelper.init();
   bool? isDark = CacheHelper.getData(key: 'isDark');
   runApp(MyApp(isDark: isDark));

@@ -44,12 +44,14 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0.0,
         actions: [
-          TextButton(
-              onPressed: () {
-                pushReplace(context, const Login());
-              },
-              child: const Text("Skip"))
+          defaultTextButton(
+            text: 'Skip',
+            function: () {
+              pushReplace(context, Login());
+            },
+          )
         ],
       ),
       body: SizedBox(
@@ -94,7 +96,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           if (isLast) {
-            pushReplace(context, const Login());
+            pushReplace(context, Login());
           }
           indicatorController.nextPage(
               duration: const Duration(milliseconds: 750),
