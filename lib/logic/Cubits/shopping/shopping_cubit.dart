@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 
-import '../../Shared/services/local/cache_helper.dart';
+import '../../../Shared/services/local/cache_helper.dart';
 
 part 'shopping_state.dart';
 

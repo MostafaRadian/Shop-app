@@ -5,8 +5,8 @@ import 'package:shop_app/Shared/services/api/dio_helper.dart';
 import 'package:shop_app/Shared/styles/themes.dart';
 
 import 'Shared/services/local/cache_helper.dart';
-import 'logic/bloc_observer.dart';
-import 'logic/shopping/shopping_cubit.dart';
+import 'logic/Cubits/bloc_observer.dart';
+import 'logic/Cubits/shopping/shopping_cubit.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
         theme: lightTheme,
         darkTheme: darkTheme,
         themeMode: ShoppingCubit.mode ? ThemeMode.dark : ThemeMode.light,
-        home: OnBoardingScreen(),
+        home: const OnBoardingScreen(),
       ),
     );
   }

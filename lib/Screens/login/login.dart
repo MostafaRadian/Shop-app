@@ -1,10 +1,11 @@
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shop_app/Screens/register/register.dart';
 import 'package:shop_app/Shared/components/components.dart';
 
-import '../../logic/login/login_cubit.dart';
+import '../../logic/Cubits/login/login_cubit.dart';
 
 class Login extends StatelessWidget {
   Login({super.key});
@@ -54,20 +55,27 @@ class Login extends StatelessWidget {
                   const SizedBox(
                     height: 20,
                   ),
-                  defaultFormField(
-                    passwordController,
-                    TextInputType.visiblePassword,
-                    (value) {
-                      if (value!.isEmpty) {
-                        return "Password must not be empty";
-                      }
-                      return null;
+                  BlocBuilder<LoginCubit, LoginState>(
+                    builder: (context, state) {
+                      return defaultFormField(
+                        passwordController,
+                        TextInputType.visiblePassword,
+                        (value) {
+                          if (value!.isEmpty) {
+                            return "Password must not be empty";
+                          }
+                          return null;
+                        },
+                        'Password',
+                        Colors.cyan,
+                        const Icon(Icons.lock_outline),
+                        suffixIcon: LoginCubit.suffix,
+                        hidden: LoginCubit.isPassword,
+                        function: () {
+                          LoginCubit.get(context).changePassVisibility();
+                        },
+                      );
                     },
-                    'Password',
-                    Colors.cyan,
-                    const Icon(Icons.lock_outline),
-                    suffixIcon: Icons.visibility_off_outlined,
-                    function: () {},
                   ),
                   const SizedBox(
                     height: 20,
@@ -80,8 +88,9 @@ class Login extends StatelessWidget {
                           function: () async {
                             if (formKey.currentState!.validate()) {
                               await LoginCubit.get(context).userLogin(
-                                  email: emailController.text,
-                                  password: passwordController.text);
+                                email: emailController.text,
+                                password: passwordController.text,
+                              );
                             }
                           },
                           color: Colors.cyan,
@@ -113,6 +122,35 @@ class Login extends StatelessWidget {
                         },
                       )
                     ],
+                  ),
+                  BlocListener<LoginCubit, LoginState>(
+                    listener: (context, state) {
+                      if (state is LoginSuccessState) {
+                        var mod = LoginCubit.get(context).loginMod;
+                        if (mod!.status) {
+                          Fluttertoast.showToast(
+                            msg: mod.message,
+                            toastLength: Toast.LENGTH_LONG,
+                            gravity: ToastGravity.SNACKBAR,
+                            timeInSecForIosWeb: 3,
+                            backgroundColor: Colors.green,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Fluttertoast.showToast(
+                            msg: mod.message,
+                            toastLength: Toast.LENGTH_LONG,
+                            gravity: ToastGravity.SNACKBAR,
+                            timeInSecForIosWeb: 3,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        }
+                      }
+                    },
+                    child: Container(),
                   )
                 ],
               ),

@@ -34,11 +34,12 @@ dependencies:
   bloc: ^8.1.2
   dio: ^5.4.0
   shared_preferences: ^2.2.2
-  webview_flutter: ^4.4.2
+  webview_flutter: ^4.4.3
   meta: ^1.10.0
   hexcolor: ^3.0.1
   smooth_page_indicator: ^1.1.0
   conditional_builder_null_safety: ^0.0.6
+  fluttertoast: ^8.2.4
 
 
 
