@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+String getWarningMessage() {
+  return "Incorrect email format";
+}
 
 void navigateTo(context, page) {
   Navigator.push(context, MaterialPageRoute(builder: (context) => page));
@@ -72,3 +77,32 @@ Widget defaultTextButton({
         textAlign: TextAlign.center,
       ),
     );
+
+void showToast({required String message, required ToastStates state}) =>
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.SNACKBAR,
+      timeInSecForIosWeb: 3,
+      backgroundColor: chooseToastColor(state),
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+
+enum ToastStates { success, error, warning }
+
+Color chooseToastColor(ToastStates state) {
+  Color color;
+  switch (state) {
+    case ToastStates.success:
+      color = Colors.green;
+      break;
+    case ToastStates.error:
+      color = Colors.red;
+      break;
+    case ToastStates.warning:
+      color = Colors.orange;
+      break;
+  }
+  return color;
+}

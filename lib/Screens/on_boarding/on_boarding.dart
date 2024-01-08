@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shop_app/Screens/login/login.dart';
+import 'package:shop_app/Shared/services/local/cache_helper.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../Shared/components/components.dart';
@@ -21,8 +22,6 @@ class OnBoardingScreen extends StatefulWidget {
 class _OnBoardingScreenState extends State<OnBoardingScreen> {
   final indicatorController =
       PageController(viewportFraction: 1, keepPage: true);
-
-  final counter = 3;
 
   final List<BoardingModel> models = [
     BoardingModel(
@@ -48,8 +47,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
         actions: [
           defaultTextButton(
             text: 'Skip',
-            function: () {
-              pushReplace(context, Login());
+            function: () async {
+              await submit(context);
             },
           )
         ],
@@ -82,7 +81,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             ),
             SmoothPageIndicator(
               controller: indicatorController,
-              count: counter,
+              count: models.length,
               effect: WormEffect(
                   type: WormType.thin, activeDotColor: Colors.cyan.shade400),
             ),
@@ -94,9 +93,9 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
           if (isLast) {
-            pushReplace(context, Login());
+            await submit(context);
           }
           indicatorController.nextPage(
               duration: const Duration(milliseconds: 750),
@@ -134,4 +133,9 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
           ],
         ),
       );
+}
+
+Future<void> submit(context) async {
+  await CacheHelper.saveData(key: 'onBoarding', value: true);
+  pushReplace(context, Login());
 }

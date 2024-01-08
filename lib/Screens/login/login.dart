@@ -1,11 +1,12 @@
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shop_app/Screens/register/register.dart';
 import 'package:shop_app/Shared/components/components.dart';
+import 'package:shop_app/Shared/services/local/cache_helper.dart';
 
 import '../../logic/Cubits/login/login_cubit.dart';
+import '../Layout/shop_layout.dart';
 
 class Login extends StatelessWidget {
   Login({super.key});
@@ -129,25 +130,27 @@ class Login extends StatelessWidget {
                         if (state is LoginSuccessState) {
                           var mod = LoginCubit.get(context).loginMod;
                           if (mod!.status) {
-                            Fluttertoast.showToast(
-                              msg: mod.message,
-                              toastLength: Toast.LENGTH_LONG,
-                              gravity: ToastGravity.SNACKBAR,
-                              timeInSecForIosWeb: 3,
-                              backgroundColor: Colors.green,
-                              textColor: Colors.white,
-                              fontSize: 16.0,
+                            showToast(
+                              message: mod.message,
+                              state: ToastStates.success,
                             );
+                            CacheHelper.saveData(
+                              key: 'token',
+                              value: mod.data?.token,
+                            ).then((value) =>
+                                pushReplace(context, const ShopLayout()));
                           } else {
-                            Fluttertoast.showToast(
-                              msg: mod.message,
-                              toastLength: Toast.LENGTH_LONG,
-                              gravity: ToastGravity.SNACKBAR,
-                              timeInSecForIosWeb: 3,
-                              backgroundColor: Colors.red,
-                              textColor: Colors.white,
-                              fontSize: 16.0,
-                            );
+                            if (mod.message == getWarningMessage()) {
+                              showToast(
+                                message: mod.message,
+                                state: ToastStates.warning,
+                              );
+                            } else {
+                              showToast(
+                                message: mod.message,
+                                state: ToastStates.error,
+                              );
+                            }
                           }
                         }
                       },
