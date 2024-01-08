@@ -29,5 +29,6 @@ class CacheHelper {
     }
   }
 
-  //static dynamic getData({required String key})=> sharedPreferences.getBool(key);
+  static Future<bool> removeData({required String key}) async =>
+      await sharedPreferences.remove(key);
 }
