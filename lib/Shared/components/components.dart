@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import '../../Screens/login/login.dart';
+import '../services/local/cache_helper.dart';
+
 String getWarningMessage() {
   return "Incorrect email format";
 }
@@ -105,4 +108,15 @@ Color chooseToastColor(ToastStates state) {
       break;
   }
   return color;
+}
+
+void signOut(context) {
+  TextButton(
+    onPressed: () {
+      CacheHelper.removeData(key: 'token').then(
+        (value) => pushReplace(context, Login()),
+      );
+    },
+    child: const Text("Log out"),
+  );
 }
