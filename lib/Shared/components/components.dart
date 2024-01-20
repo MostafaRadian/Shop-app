@@ -120,3 +120,8 @@ void signOut(context) {
     child: const Text("Log out"),
   );
 }
+
+printFullText(String text) {
+  final pattern = RegExp('.{1,800}');
+  pattern.allMatches(text).forEach((element) => print(element.group(0)));
+}

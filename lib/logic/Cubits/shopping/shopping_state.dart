@@ -8,3 +8,9 @@ class ShoppingInitial extends ShoppingState {}
 class ChangeThemeModeState extends ShoppingState {}
 
 class ChangeBottomNavState extends ShoppingState {}
+
+class ShopHomeDataLoadingState extends ShoppingState {}
+
+class ShopHomeDataSuccessState extends ShoppingState {}
+
+class ShopHomeDataErrorState extends ShoppingState {}

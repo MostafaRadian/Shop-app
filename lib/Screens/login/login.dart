@@ -137,8 +137,8 @@ class Login extends StatelessWidget {
                             CacheHelper.saveData(
                               key: 'token',
                               value: mod.data?.token,
-                            ).then((value) =>
-                                pushReplace(context, const ShopLayout()));
+                            ).then(
+                                (value) => pushReplace(context, ShopLayout()));
                           } else {
                             if (mod.message == getWarningMessage()) {
                               showToast(

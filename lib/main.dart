@@ -6,6 +6,7 @@ import 'package:shop_app/Shared/services/api/dio_helper.dart';
 import 'package:shop_app/Shared/styles/themes.dart';
 
 import 'Screens/login/login.dart';
+import 'Shared/constants/constants.dart';
 import 'Shared/services/local/cache_helper.dart';
 import 'logic/Cubits/bloc_observer.dart';
 import 'logic/Cubits/shopping/shopping_cubit.dart';
@@ -17,7 +18,7 @@ Future<void> main() async {
   await CacheHelper.init();
   final bool? isDark = CacheHelper.getData(key: 'isDark');
   bool? onBoarding = CacheHelper.getData(key: 'onBoarding');
-  String? token = CacheHelper.getData(key: 'token');
+  token = CacheHelper.getData(key: 'token');
   final Widget startWidget = determineStartWidget(onBoarding, token);
 
   runApp(MyApp(isDark: isDark, startWidget: startWidget));
@@ -38,8 +39,9 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<ShoppingCubit>(
-            create: (context) =>
-                ShoppingCubit()..changeThemeMode(sharedTheme: isDark))
+            create: (context) => ShoppingCubit()
+              ..changeThemeMode(sharedTheme: isDark)
+              ..getHomeData())
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
