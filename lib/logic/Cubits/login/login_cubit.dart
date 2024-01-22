@@ -35,7 +35,7 @@ class LoginCubit extends Cubit<LoginState> {
       }
 
       emit(LoginSuccessState());
-    } catch (error) {
+    } on Exception catch (error) {
       if (kDebugMode) {
         print(error);
       }

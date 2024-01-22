@@ -70,3 +70,5 @@ ThemeData lightTheme = ThemeData(
       unselectedItemColor: Colors.grey,
       backgroundColor: Colors.white),
 );
+
+Color defaultColor = Colors.cyan;

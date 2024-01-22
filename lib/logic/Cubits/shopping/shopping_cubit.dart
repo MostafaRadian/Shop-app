@@ -8,7 +8,6 @@ import 'package:shop_app/Screens/settings/settings.dart';
 import 'package:shop_app/Shared/services/api/dio_helper.dart';
 import 'package:shop_app/logic/models/Home%20model/home_model.dart';
 
-import '../../../Shared/components/components.dart';
 import '../../../Shared/constants/constants.dart';
 import '../../../Shared/services/endpoints/end_points.dart';
 import '../../../Shared/services/local/cache_helper.dart';
@@ -18,7 +17,7 @@ part 'shopping_state.dart';
 class ShoppingCubit extends Cubit<ShoppingState> {
   ShoppingCubit() : super(ShoppingInitial());
   static ShoppingCubit get(context) => BlocProvider.of(context);
-  late HomeModel homeModel;
+  HomeModel? homeModel;
   static bool mode = false;
   static int currentIndex = 0;
   static List<String> titles = [
@@ -55,11 +54,10 @@ class ShoppingCubit extends Cubit<ShoppingState> {
       DioHelper.getData(url: home, auth: token).then(
         (value) {
           homeModel = HomeModel.fromJson(value.data);
-          printFullText(homeModel.data!.products[0].name);
           emit(ShopHomeDataSuccessState());
         },
       );
-    } catch (error) {
+    } on Exception catch (error) {
       if (kDebugMode) {
         print(error);
       }
