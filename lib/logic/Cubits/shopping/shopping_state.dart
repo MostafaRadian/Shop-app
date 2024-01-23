@@ -18,3 +18,15 @@ class ShopHomeDataErrorState extends ShoppingState {}
 class ShopCategoriesSuccessState extends ShoppingState {}
 
 class ShopCategoriesErrorState extends ShoppingState {}
+
+class ShopChangeFavState extends ShoppingState {}
+
+class ShopChangeFavSuccessState extends ShoppingState {}
+
+class ShopChangeFavErrorState extends ShoppingState {}
+
+class ShopGetFavLoadingState extends ShoppingState {}
+
+class ShopGetFavSuccessState extends ShoppingState {}
+
+class ShopGetFavErrorState extends ShoppingState {}

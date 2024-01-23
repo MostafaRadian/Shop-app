@@ -13,7 +13,7 @@ const List<BottomNavigationBarItem> bottomNavList = [
   ),
   BottomNavigationBarItem(
     icon: Icon(Icons.favorite_outline, color: Colors.blueGrey),
-    label: "favourite",
+    label: "favorite",
   ),
   BottomNavigationBarItem(
     icon: Icon(Icons.settings, color: Colors.blueGrey),

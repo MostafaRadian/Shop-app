@@ -1,6 +1,9 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shop_app/logic/Cubits/shopping/shopping_cubit.dart';
+import 'package:shop_app/logic/models/Categories%20model/categories_model.dart';
+import 'package:shop_app/logic/models/favourite%20model/favorite_model.dart';
 
 import '../../Screens/login/login.dart';
 import '../../logic/models/Home model/home_model.dart';
@@ -124,9 +127,14 @@ void signOut(context) {
   );
 }
 
-Widget productsBuilder(HomeModel? model) => SingleChildScrollView(
+//Products Screen
+
+Widget productsBuilder(
+        HomeModel? model, CategoriesModel? categoriesModel, context) =>
+    SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CarouselSlider(
             items: model?.data?.banners
@@ -154,6 +162,46 @@ Widget productsBuilder(HomeModel? model) => SingleChildScrollView(
           const SizedBox(
             height: 20,
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Categories',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                SizedBox(
+                  height: 100,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    itemBuilder: (context, index) =>
+                        buildCategoryItem(categoriesModel?.data?.data[index]),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 10),
+                    itemCount: categoriesModel?.data?.data.length ?? 0,
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                const Text(
+                  'New Products',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
           Container(
             color: Colors.grey[300],
             child: GridView.count(
@@ -165,7 +213,8 @@ Widget productsBuilder(HomeModel? model) => SingleChildScrollView(
               physics: const NeverScrollableScrollPhysics(),
               children: List.generate(
                 model?.data?.products.length ?? 0,
-                (index) => buildGridProduct(model?.data!.products[index]),
+                (index) =>
+                    buildGridProduct(model?.data!.products[index], context),
               ),
             ),
           )
@@ -173,7 +222,7 @@ Widget productsBuilder(HomeModel? model) => SingleChildScrollView(
       ),
     );
 
-Widget buildGridProduct(ProductModel? productModel) => Container(
+Widget buildGridProduct(ProductModel? productModel, context) => Container(
       color: Colors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -232,11 +281,23 @@ Widget buildGridProduct(ProductModel? productModel) => Container(
                       ),
                     const Spacer(),
                     IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () {},
-                      icon: const Icon(
-                        Icons.favorite_outline,
-                        size: 14,
+                      onPressed: () {
+                        ShoppingCubit.get(context)
+                            .changeFavourite(productModel.id);
+                      },
+                      icon: CircleAvatar(
+                        backgroundColor: ShoppingCubit.get(context)
+                                        .favourites[productModel.id] !=
+                                    null &&
+                                ShoppingCubit.get(context)
+                                    .favourites[productModel.id]!
+                            ? defaultColor
+                            : Colors.grey,
+                        radius: 15,
+                        child: const Icon(
+                          Icons.favorite_outline,
+                          size: 14,
+                        ),
                       ),
                     )
                   ],
@@ -245,6 +306,165 @@ Widget buildGridProduct(ProductModel? productModel) => Container(
             ),
           ),
         ],
+      ),
+    );
+
+Widget buildCategoryItem(DataModel? data) => Stack(
+      alignment: AlignmentDirectional.bottomCenter,
+      children: [
+        Image(
+          image: NetworkImage(data!.image),
+          width: 100,
+          height: 100,
+          fit: BoxFit.cover,
+        ),
+        Container(
+            color: Colors.black.withOpacity(0.8),
+            width: 100,
+            child: Text(
+              data.name,
+              style: const TextStyle(color: Colors.white),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ))
+      ],
+    );
+
+//Category Screen
+
+Widget categoryBuilder(CategoriesModel? categoriesModel) => ListView.separated(
+      itemBuilder: (context, index) =>
+          buildCategoryScreenItem(categoriesModel?.data?.data[index]),
+      separatorBuilder: (context, index) =>
+          const Divider(), //const SizedBox(height: 20),
+      itemCount: categoriesModel?.data?.data.length ?? 0,
+    );
+
+Widget buildCategoryScreenItem(DataModel? data) => Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Row(
+        children: [
+          Image(
+            image: NetworkImage(data!.image),
+            width: 80,
+            height: 80,
+            fit: BoxFit.cover,
+          ),
+          const SizedBox(
+            width: 20,
+          ),
+          Text(
+            data.name,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const Spacer(),
+          const Icon(Icons.arrow_forward_ios)
+        ],
+      ),
+    );
+
+//Favorite screen
+
+Widget favoriteBuilder(List<FavoritesData>? data, context) =>
+    ListView.separated(
+      physics: const BouncingScrollPhysics(),
+      itemBuilder: (context, index) => buildFavoriteItem(data![index], context),
+      separatorBuilder: (context, index) =>
+          const Divider(), //const SizedBox(height: 20),
+      itemCount: data?.length ?? 0,
+    );
+
+Widget buildFavoriteItem(FavoritesData data, context) => Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: SizedBox(
+        height: 120,
+        child: Row(
+          children: [
+            Stack(
+              alignment: AlignmentDirectional.bottomStart,
+              children: [
+                Image(
+                  image: NetworkImage(data.product!.image),
+                  width: 120,
+                  height: 120,
+                  fit: BoxFit.cover,
+                ),
+                if (data.product!.discount != 0)
+                  Container(
+                    color: Colors.red,
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: const Text(
+                      'Discount',
+                      style: TextStyle(color: Colors.white, fontSize: 8),
+                    ),
+                  )
+              ],
+            ),
+            const SizedBox(
+              width: 20,
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    data.product!.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(height: 1.3),
+                  ),
+                  const Spacer(),
+                  Row(
+                    children: [
+                      Text(
+                        '${data.product!.price}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: defaultColor,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      if (data.product!.discount != 0)
+                        Text(
+                          '${data.product!.oldPrice}',
+                          style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                              decoration: TextDecoration.lineThrough),
+                          textAlign: TextAlign.center,
+                        ),
+                      const Spacer(),
+                      IconButton(
+                        onPressed: () {
+                          ShoppingCubit.get(context)
+                              .changeFavourite(data.product!.id);
+                        },
+                        icon: CircleAvatar(
+                          backgroundColor: ShoppingCubit.get(context)
+                                          .favourites[data.product!.id] !=
+                                      null &&
+                                  ShoppingCubit.get(context)
+                                      .favourites[data.product!.id]!
+                              ? defaultColor
+                              : Colors.grey,
+                          radius: 15,
+                          child: const Icon(
+                            Icons.favorite_outline,
+                            size: 14,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
 

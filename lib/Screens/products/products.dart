@@ -10,12 +10,26 @@ class ProductScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ShoppingCubit, ShoppingState>(
+    return BlocConsumer<ShoppingCubit, ShoppingState>(
+      listener: (context, state) {
+        if (state is ShopChangeFavState) {
+          bool isFav =
+              ShoppingCubit.get(context).simpleFavoriteModel?.status ?? false;
+          String message =
+              ShoppingCubit.get(context).simpleFavoriteModel?.message ?? '';
+          if (!isFav) {
+            showToast(message: message, state: ToastStates.error);
+          }
+        }
+      },
       builder: (context, state) {
         return ConditionalBuilder(
-          condition: ShoppingCubit.get(context).homeModel?.status == true,
-          builder: (context) =>
-              productsBuilder(ShoppingCubit.get(context).homeModel),
+          condition: ShoppingCubit.get(context).homeModel?.status == true &&
+              ShoppingCubit.get(context).categoriesModel?.status == true,
+          builder: (context) => productsBuilder(
+              ShoppingCubit.get(context).homeModel,
+              ShoppingCubit.get(context).categoriesModel,
+              context),
           fallback: (context) => const Center(
             child: CircularProgressIndicator(),
           ),

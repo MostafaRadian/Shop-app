@@ -35,7 +35,7 @@ class DioHelper {
     dio.options.headers = {
       'lang': lang,
       'Content-Type': 'application/json',
-      'Authorization': auth ?? ''
+      'Authorization': auth
     };
     return await dio.get(url, queryParameters: query);
   }
@@ -49,7 +49,7 @@ class DioHelper {
   }) async {
     dio.options.headers = {
       'lang': lang,
-      'Authorization': auth ?? '',
+      'Authorization': auth,
       'Content-Type': 'application/json',
     };
     return await dio.post(url, data: data, queryParameters: query);

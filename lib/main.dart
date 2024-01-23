@@ -39,9 +39,8 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<ShoppingCubit>(
-            create: (context) => ShoppingCubit()
-              ..changeThemeMode(sharedTheme: isDark)
-              ..getHomeData())
+          create: (context) => ShoppingCubit()..getData(),
+        )
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
