@@ -1,11 +1,11 @@
-class LoginModel {
+class UserModel {
   late bool status;
   late String message;
   late UserData? data;
-  LoginModel.fromJason(Map<String, dynamic> json) {
+  UserModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
-    message = json['message'];
-    data = json['data'] != null ? UserData.fromJason(data: json['data']) : null;
+    message = json['message'] ?? '';
+    data = json['data'] != null ? UserData.fromJson(data: json['data']) : null;
   }
 }
 
@@ -29,12 +29,17 @@ class UserData {
     this.points,
   });
 
-  UserData.fromJason({required Map<String, dynamic> data}) {
+  UserData.fromJson({required Map<String, dynamic> data}) {
     id = data['id'] ?? 0;
     name = data['name'] ?? '';
     email = data['email'] ?? '';
     phone = data['phone'] ?? '';
-    image = data['image'] ?? '';
+    if (data['image'] ==
+        'https://student.valuxapps.com/storage/uploads/users/fEnNgRcltP_1703841665.jpeg') {
+      image = '';
+    } else {
+      image = data['image'];
+    }
     token = data['token'] ?? '';
     credit = data['credit'] ?? 0;
     points = data['points'] ?? 0;

@@ -19,6 +19,10 @@ class ShopCategoriesSuccessState extends ShoppingState {}
 
 class ShopCategoriesErrorState extends ShoppingState {}
 
+class ShopGetUserDataSuccessState extends ShoppingState {}
+
+class ShopGetUserDataErrorState extends ShoppingState {}
+
 class ShopChangeFavState extends ShoppingState {}
 
 class ShopChangeFavSuccessState extends ShoppingState {}
@@ -30,3 +34,12 @@ class ShopGetFavLoadingState extends ShoppingState {}
 class ShopGetFavSuccessState extends ShoppingState {}
 
 class ShopGetFavErrorState extends ShoppingState {}
+
+class ShopUpdateUserLoadingState extends ShoppingState {}
+
+class ShopUpdateUserSuccessState extends ShoppingState {
+  final UserModel userModel;
+  ShopUpdateUserSuccessState({required this.userModel});
+}
+
+class ShopUpdateUserFailedState extends ShoppingState {}

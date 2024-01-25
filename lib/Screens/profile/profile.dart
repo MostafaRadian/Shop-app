@@ -1,21 +1,23 @@
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shop_app/Screens/profile/profile.dart';
-import 'package:shop_app/Shared/components/components.dart';
-import 'package:shop_app/Shared/services/local/cache_helper.dart';
+import 'package:shop_app/logic/Cubits/shopping/shopping_cubit.dart';
 
+import '../../Shared/components/components.dart';
 import '../../Shared/constants/constants.dart';
+import '../../Shared/services/local/cache_helper.dart';
 import '../../Shared/styles/themes.dart';
-import '../../logic/Cubits/login/login_cubit.dart';
-import '../../logic/Cubits/shopping/shopping_cubit.dart';
+import '../../logic/Cubits/register/register_cubit.dart';
 import '../Layout/shop_layout.dart';
+import '../login/login.dart';
 
-class Login extends StatelessWidget {
-  Login({super.key});
+class Register extends StatelessWidget {
+  Register({super.key});
   final formKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +35,7 @@ class Login extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    'LOGIN',
+                    'Register',
                     style: Theme.of(context)
                         .textTheme
                         .headlineMedium
@@ -41,6 +43,22 @@ class Login extends StatelessWidget {
                   ),
                   const SizedBox(
                     height: 30,
+                  ),
+                  defaultFormField(
+                    nameController,
+                    TextInputType.text,
+                    (value) {
+                      if (value!.isEmpty) {
+                        return "Name must not be empty";
+                      }
+                      return null;
+                    },
+                    'Name',
+                    defaultColor,
+                    const Icon(Icons.person_outline),
+                  ),
+                  const SizedBox(
+                    height: 20,
                   ),
                   defaultFormField(
                     emailController,
@@ -58,7 +76,23 @@ class Login extends StatelessWidget {
                   const SizedBox(
                     height: 20,
                   ),
-                  BlocBuilder<LoginCubit, LoginState>(
+                  defaultFormField(
+                    phoneController,
+                    TextInputType.phone,
+                    (value) {
+                      if (value!.isEmpty) {
+                        return "Email address must not be empty";
+                      }
+                      return null;
+                    },
+                    'Phone',
+                    defaultColor,
+                    const Icon(Icons.phone_outlined),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  BlocBuilder<RegisterCubit, RegisterState>(
                     builder: (context, state) {
                       return defaultFormField(
                         passwordController,
@@ -72,10 +106,10 @@ class Login extends StatelessWidget {
                         'Password',
                         defaultColor,
                         const Icon(Icons.lock_outline),
-                        suffixIcon: LoginCubit.suffix,
-                        hidden: LoginCubit.isPassword,
+                        suffixIcon: RegisterCubit.suffix,
+                        hidden: RegisterCubit.isPassword,
                         function: () {
-                          LoginCubit.get(context).changePassVisibility();
+                          RegisterCubit.get(context).changePassVisibility();
                         },
                       );
                     },
@@ -83,21 +117,23 @@ class Login extends StatelessWidget {
                   const SizedBox(
                     height: 20,
                   ),
-                  BlocBuilder<LoginCubit, LoginState>(
+                  BlocBuilder<RegisterCubit, RegisterState>(
                     builder: (context, state) {
                       return ConditionalBuilder(
-                        condition: state is! LoginLoadingState,
+                        condition: state is! RegisterLoadingState,
                         builder: (BuildContext context) => defaultButton(
                           function: () async {
                             if (formKey.currentState!.validate()) {
-                              await LoginCubit.get(context).userLogin(
+                              await RegisterCubit.get(context).registerUser(
+                                name: nameController.text,
                                 email: emailController.text,
                                 password: passwordController.text,
+                                phone: phoneController.text,
                               );
                             }
                           },
                           color: defaultColor,
-                          text: "Sign in",
+                          text: "Sign up",
                         ),
                         fallback: (BuildContext context) => Center(
                           child: CircularProgressIndicator(
@@ -114,22 +150,22 @@ class Login extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
-                        "Don't have an account?",
+                        "Already have an account?",
                         style: TextStyle(fontSize: 15),
                         textAlign: TextAlign.center,
                       ),
                       defaultTextButton(
-                        text: 'Register Now',
+                        text: 'Login Now',
                         function: () {
-                          navigateTo(context, Register());
+                          navigateTo(context, Login());
                         },
                       )
                     ],
                   ),
-                  BlocListener<LoginCubit, LoginState>(
+                  BlocListener<RegisterCubit, RegisterState>(
                     listener: (context, state) {
-                      if (state is LoginSuccessState) {
-                        var mod = LoginCubit.get(context).loginMod;
+                      if (state is RegisterSuccessState) {
+                        var mod = RegisterCubit.get(context).user;
                         if (mod!.status) {
                           showToast(
                             message: mod.message,

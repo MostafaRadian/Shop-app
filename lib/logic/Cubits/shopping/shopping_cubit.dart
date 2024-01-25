@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,6 +9,7 @@ import 'package:shop_app/Screens/settings/settings.dart';
 import 'package:shop_app/Shared/services/api/dio_helper.dart';
 import 'package:shop_app/logic/models/Categories%20model/categories_model.dart';
 import 'package:shop_app/logic/models/Home%20model/home_model.dart';
+import 'package:shop_app/logic/models/Login%20model/login_model.dart';
 import 'package:shop_app/logic/models/favourite%20model/favorite_model.dart';
 import 'package:shop_app/logic/models/favourite%20model/favourite_model.dart';
 
@@ -24,21 +26,17 @@ class ShoppingCubit extends Cubit<ShoppingState> {
   CategoriesModel? categoriesModel;
   SimpleFavoriteModel? simpleFavoriteModel;
   FavoriteProductsModel? favoriteProductsModel;
+  UserModel? userDataModel;
 
   Map<int, bool> favourites = {};
   static bool mode = false;
   static int currentIndex = 0;
-  static List<String> titles = [
-    'Products',
-    'Category',
-    'Favourite',
-    'Settings'
-  ];
+  static List<String> titles = ['Products', 'Category', 'Favourite', 'Profile'];
   static List<Widget> screens = [
     const ProductScreen(),
     const CategoryScreen(),
     const FavouriteScreen(),
-    const SettingsScreen(),
+    ProfileScreen(),
   ];
 
   void changeBottom({required int index}) {
@@ -56,26 +54,67 @@ class ShoppingCubit extends Cubit<ShoppingState> {
     emit(ChangeThemeModeState());
   }
 
-  void getData() {
-    getHomeData();
-    getCategoriesData();
-    getFavourite();
+  Future<void> getData() async {
+    await getHomeData();
+    await getCategoriesData();
+    await getFavourite();
+    await getProfileData();
   }
 
-  void getHomeData() {
+  Future<void> getInitial() async {
+    await getFavourite();
+    await getProfileData();
+  }
+
+  Future<void> getProfileData() async {
+    try {
+      Response<dynamic> result =
+          await DioHelper.getData(url: profile, auth: token);
+      userDataModel = UserModel.fromJson(result.data);
+      emit(ShopGetUserDataSuccessState());
+    } on Exception catch (error) {
+      if (kDebugMode) {
+        print(error);
+      }
+      emit(ShopGetUserDataErrorState());
+    }
+  }
+
+  Future<void> updateProfileData({
+    required String name,
+    required String email,
+    required String phone,
+  }) async {
+    emit(ShopUpdateUserLoadingState());
+    try {
+      Response<dynamic> result = await DioHelper.putData(
+        url: update,
+        auth: token,
+        data: {'name': name, 'email': email, 'phone': phone},
+      );
+      userDataModel = UserModel.fromJson(result.data);
+      emit(ShopUpdateUserSuccessState(userModel: userDataModel!));
+    } on Exception catch (error) {
+      if (kDebugMode) {
+        print(error);
+      }
+      emit(ShopUpdateUserFailedState());
+    }
+  }
+
+  Future<void> getHomeData() async {
     emit(ShopHomeDataLoadingState());
     try {
-      DioHelper.getData(url: home, auth: token).then(
-        (value) {
-          homeModel = HomeModel.fromJson(value.data);
-          homeModel?.data?.products.forEach((element) {
-            favourites.addAll(
-              {element.id: element.inFavourite},
-            );
-          });
-          emit(ShopHomeDataSuccessState());
-        },
-      );
+      Response<dynamic> result =
+          await DioHelper.getData(url: home, auth: token);
+      homeModel = HomeModel.fromJson(result.data);
+      homeModel?.data?.products.forEach((element) {
+        favourites.addAll(
+          {element.id: element.inFavourite},
+        );
+      });
+
+      emit(ShopHomeDataSuccessState());
     } on Exception catch (error) {
       if (kDebugMode) {
         print(error);
@@ -84,15 +123,14 @@ class ShoppingCubit extends Cubit<ShoppingState> {
     }
   }
 
-  void getCategoriesData() {
+  Future<void> getCategoriesData() async {
     emit(ShopHomeDataLoadingState());
     try {
-      DioHelper.getData(url: categories, auth: token).then(
-        (value) {
-          categoriesModel = CategoriesModel.fromJson(value.data);
-          emit(ShopCategoriesSuccessState());
-        },
-      );
+      Response<dynamic> result =
+          await DioHelper.getData(url: categories, auth: token);
+      categoriesModel = CategoriesModel.fromJson(result.data);
+
+      emit(ShopCategoriesSuccessState());
     } on Exception catch (error) {
       if (kDebugMode) {
         print(error);
@@ -101,15 +139,15 @@ class ShoppingCubit extends Cubit<ShoppingState> {
     }
   }
 
-  void getFavourite() {
+  Future<void> getFavourite() async {
+    emit(ShopGetFavLoadingState());
+
     try {
-      emit(ShopGetFavLoadingState());
-      DioHelper.getData(url: favourite, auth: token).then(
-        (value) {
-          favoriteProductsModel = FavoriteProductsModel.fromJson(value.data);
-          emit(ShopGetFavSuccessState());
-        },
-      );
+      Response<dynamic> result =
+          await DioHelper.getData(url: favourite, auth: token);
+      favoriteProductsModel = FavoriteProductsModel.fromJson(result.data);
+
+      emit(ShopGetFavSuccessState());
     } on Exception catch (error) {
       if (kDebugMode) {
         print(error);
@@ -118,26 +156,23 @@ class ShoppingCubit extends Cubit<ShoppingState> {
     }
   }
 
-  void changeFavourite(productId) {
+  Future<void> changeFavourite(productId) async {
     try {
       favourites[productId] = !favourites[productId]!;
       emit(ShopChangeFavState());
-
-      DioHelper.postData(
+      Response<dynamic> result = await DioHelper.postData(
         url: favourite,
         data: {'product_id': productId},
         auth: token,
-      ).then(
-        (value) {
-          simpleFavoriteModel = SimpleFavoriteModel.fromJson(value.data);
-          if (!simpleFavoriteModel!.status) {
-            favourites[productId] = !favourites[productId]!;
-          } else {
-            getFavourite();
-          }
-          emit(ShopChangeFavSuccessState());
-        },
       );
+      simpleFavoriteModel = SimpleFavoriteModel.fromJson(result.data);
+      if (!simpleFavoriteModel!.status) {
+        favourites[productId] = !favourites[productId]!;
+      } else {
+        getFavourite();
+      }
+
+      emit(ShopChangeFavSuccessState());
     } on Exception catch (e) {
       if (kDebugMode) {
         print(e);

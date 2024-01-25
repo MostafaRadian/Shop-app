@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shop_app/Shared/services/endpoints/end_points.dart';
 import 'package:shop_app/logic/models/Login%20model/login_model.dart';
 
 import '../../../Shared/services/api/dio_helper.dart';
@@ -12,7 +13,7 @@ class LoginCubit extends Cubit<LoginState> {
   LoginCubit() : super(LoginInitial());
   static IconData suffix = Icons.visibility_outlined;
   static bool isPassword = true;
-  LoginModel? loginMod;
+  UserModel? loginMod;
 
   static LoginCubit get(context) => BlocProvider.of(context);
 
@@ -23,10 +24,10 @@ class LoginCubit extends Cubit<LoginState> {
     try {
       emit(LoginLoadingState());
       Response<dynamic> result = await DioHelper.postData(
-        url: 'login',
+        url: login,
         data: {'email': email, 'password': password},
       );
-      loginMod = LoginModel.fromJason(result.data);
+      loginMod = UserModel.fromJson(result.data);
       if (kDebugMode) {
         print(loginMod?.status);
       }

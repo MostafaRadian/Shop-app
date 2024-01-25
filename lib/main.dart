@@ -4,11 +4,13 @@ import 'package:shop_app/Screens/Layout/shop_layout.dart';
 import 'package:shop_app/Screens/on_boarding/on_boarding.dart';
 import 'package:shop_app/Shared/services/api/dio_helper.dart';
 import 'package:shop_app/Shared/styles/themes.dart';
+import 'package:shop_app/logic/Cubits/register/register_cubit.dart';
 
 import 'Screens/login/login.dart';
 import 'Shared/constants/constants.dart';
 import 'Shared/services/local/cache_helper.dart';
 import 'logic/Cubits/bloc_observer.dart';
+import 'logic/Cubits/login/login_cubit.dart';
 import 'logic/Cubits/shopping/shopping_cubit.dart';
 
 Future<void> main() async {
@@ -40,6 +42,12 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider<ShoppingCubit>(
           create: (context) => ShoppingCubit()..getData(),
+        ),
+        BlocProvider<LoginCubit>(
+          create: (context) => LoginCubit(),
+        ),
+        BlocProvider<RegisterCubit>(
+          create: (context) => RegisterCubit(),
         )
       ],
       child: MaterialApp(

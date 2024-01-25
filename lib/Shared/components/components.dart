@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shop_app/logic/Cubits/shopping/shopping_cubit.dart';
 import 'package:shop_app/logic/models/Categories%20model/categories_model.dart';
@@ -7,6 +8,7 @@ import 'package:shop_app/logic/models/favourite%20model/favorite_model.dart';
 
 import '../../Screens/login/login.dart';
 import '../../logic/models/Home model/home_model.dart';
+import '../constants/constants.dart';
 import '../services/local/cache_helper.dart';
 import '../styles/themes.dart';
 
@@ -58,7 +60,7 @@ Widget defaultFormField(
   IconData? suffixIcon,
 }) =>
     SizedBox(
-      width: 300,
+      width: 400,
       child: TextFormField(
           controller: controller,
           keyboardType: type,
@@ -117,14 +119,10 @@ Color chooseToastColor(ToastStates state) {
 }
 
 void signOut(context) {
-  TextButton(
-    onPressed: () {
-      CacheHelper.removeData(key: 'token').then(
-        (value) => pushReplace(context, Login()),
-      );
-    },
-    child: const Text("Log out"),
-  );
+  CacheHelper.removeData(key: 'token').then((value) {
+    token = '';
+    pushReplace(context, Login());
+  });
 }
 
 //Products Screen
@@ -438,25 +436,30 @@ Widget buildFavoriteItem(FavoritesData data, context) => Padding(
                           textAlign: TextAlign.center,
                         ),
                       const Spacer(),
-                      IconButton(
-                        onPressed: () {
-                          ShoppingCubit.get(context)
-                              .changeFavourite(data.product!.id);
+                      BlocBuilder<ShoppingCubit, ShoppingState>(
+                        builder: (context, state) {
+                          return IconButton(
+                            onPressed: () {
+                              ShoppingCubit.get(context)
+                                  .changeFavourite(data.product!.id);
+                            },
+                            icon: CircleAvatar(
+                              backgroundColor: ShoppingCubit.get(context)
+                                              .favourites[data.product!.id] !=
+                                          null &&
+                                      ShoppingCubit.get(context)
+                                              .favourites[data.product!.id] !=
+                                          false
+                                  ? defaultColor
+                                  : Colors.grey,
+                              radius: 15,
+                              child: const Icon(
+                                Icons.favorite_outline,
+                                size: 14,
+                              ),
+                            ),
+                          );
                         },
-                        icon: CircleAvatar(
-                          backgroundColor: ShoppingCubit.get(context)
-                                          .favourites[data.product!.id] !=
-                                      null &&
-                                  ShoppingCubit.get(context)
-                                      .favourites[data.product!.id]!
-                              ? defaultColor
-                              : Colors.grey,
-                          radius: 15,
-                          child: const Icon(
-                            Icons.favorite_outline,
-                            size: 14,
-                          ),
-                        ),
                       )
                     ],
                   ),
@@ -466,6 +469,123 @@ Widget buildFavoriteItem(FavoritesData data, context) => Padding(
           ],
         ),
       ),
+    );
+
+// Settings Screen
+
+Widget buildSettings(
+  context,
+  userData,
+  nameController,
+  emailController,
+  phoneController,
+  formKey,
+) =>
+    BlocBuilder<ShoppingCubit, ShoppingState>(
+      builder: (context, state) {
+        return SingleChildScrollView(
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(30),
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  if (state is ShopUpdateUserLoadingState)
+                    const LinearProgressIndicator(),
+                  Center(
+                    child: ClipOval(
+                      child: Image(
+                        image: userData!.image.isEmpty
+                            ? const NetworkImage(
+                                'https://media.istockphoto.com/id/1300845620/fr/vectoriel/appartement-dic%C3%B4ne-dutilisateur-isol%C3%A9-sur-le-fond-blanc-symbole-utilisateur.jpg?s=612x612&w=0&k=20&c=BVOfS7mmvy2lnfBPghkN__k8OMsg7Nlykpgjn0YOHj0=',
+                              )
+                            : NetworkImage(
+                                userData.image,
+                              ),
+                        height: 200,
+                        width: 200,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  defaultFormField(
+                    nameController,
+                    TextInputType.text,
+                    (value) {
+                      if (value!.isEmpty) {
+                        return 'Name must not be empty';
+                      } else {
+                        return null;
+                      }
+                    },
+                    '',
+                    defaultColor,
+                    const Icon(Icons.person_outline),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  defaultFormField(
+                    emailController,
+                    TextInputType.emailAddress,
+                    (value) {
+                      if (value!.isEmpty) {
+                        return 'email must not be empty';
+                      } else {
+                        return null;
+                      }
+                    },
+                    '',
+                    defaultColor,
+                    const Icon(Icons.mail_outline),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  defaultFormField(
+                    phoneController,
+                    TextInputType.phone,
+                    (value) {
+                      if (value!.isEmpty) {
+                        return 'phone must not be empty';
+                      } else {
+                        return null;
+                      }
+                    },
+                    '',
+                    defaultColor,
+                    const Icon(Icons.phone_outlined),
+                  ),
+                  const SizedBox(height: 50),
+                  defaultButton(
+                      function: () async {
+                        if (formKey.currentState.validate()) {
+                          await ShoppingCubit.get(context).updateProfileData(
+                            name: nameController.text,
+                            email: emailController.text,
+                            phone: phoneController.text,
+                          );
+                        }
+                      },
+                      color: defaultColor,
+                      text: 'Update Profile'),
+                  const SizedBox(height: 30),
+                  defaultButton(
+                      function: () {
+                        signOut(context);
+                      },
+                      color: Colors.deepOrange,
+                      text: 'Log Out')
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
 
 printFullText(String text) {

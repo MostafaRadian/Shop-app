@@ -37,7 +37,7 @@ ThemeData darkTheme = ThemeData(
 );
 
 ThemeData lightTheme = ThemeData(
-  colorScheme: ColorScheme.fromSeed(seedColor: Colors.cyan.shade400),
+  colorScheme: ColorScheme.fromSeed(seedColor: defaultColor),
   useMaterial3: true,
   scaffoldBackgroundColor: Colors.white,
   textTheme: const TextTheme(
@@ -48,7 +48,7 @@ ThemeData lightTheme = ThemeData(
     ),
   ),
   floatingActionButtonTheme: FloatingActionButtonThemeData(
-    backgroundColor: Colors.cyan[400],
+    backgroundColor: defaultColor,
   ),
   appBarTheme: const AppBarTheme(
     titleSpacing: 20,
@@ -71,4 +71,4 @@ ThemeData lightTheme = ThemeData(
       backgroundColor: Colors.white),
 );
 
-Color defaultColor = Colors.cyan;
+Color defaultColor = Colors.orangeAccent;
