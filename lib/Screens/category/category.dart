@@ -12,7 +12,7 @@ class CategoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ShoppingCubit, ShoppingState>(
       builder: (context, state) => ConditionalBuilder(
-        condition: ShoppingCubit.get(context).categoriesModel?.status == true,
+        condition: ShoppingCubit.get(context).categoriesModel.status == true,
         builder: (context) =>
             categoryBuilder(ShoppingCubit.get(context).categoriesModel),
         fallback: (context) => const Center(

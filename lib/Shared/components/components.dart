@@ -183,10 +183,10 @@ Widget productsBuilder(
                     scrollDirection: Axis.horizontal,
                     physics: const BouncingScrollPhysics(),
                     itemBuilder: (context, index) =>
-                        buildCategoryItem(categoriesModel.data!.data[index]),
+                        buildCategoryItem(categoriesModel.data.data[index]),
                     separatorBuilder: (context, index) =>
                         const SizedBox(width: 10),
-                    itemCount: categoriesModel.data?.data.length ?? 0,
+                    itemCount: categoriesModel.data.data.length,
                   ),
                 ),
                 const SizedBox(
@@ -333,20 +333,20 @@ Widget buildCategoryItem(DataModel data) => Stack(
 
 //Category Screen
 
-Widget categoryBuilder(CategoriesModel? categoriesModel) => ListView.separated(
+Widget categoryBuilder(CategoriesModel categoriesModel) => ListView.separated(
       itemBuilder: (context, index) =>
-          buildCategoryScreenItem(categoriesModel?.data?.data[index]),
+          buildCategoryScreenItem(categoriesModel.data.data[index]),
       separatorBuilder: (context, index) =>
           const Divider(), //const SizedBox(height: 20),
-      itemCount: categoriesModel?.data?.data.length ?? 0,
+      itemCount: categoriesModel.data.data.length,
     );
 
-Widget buildCategoryScreenItem(DataModel? data) => Padding(
+Widget buildCategoryScreenItem(DataModel data) => Padding(
       padding: const EdgeInsets.all(20.0),
       child: Row(
         children: [
           Image(
-            image: NetworkImage(data!.image),
+            image: NetworkImage(data.image),
             width: 80,
             height: 80,
             fit: BoxFit.cover,
@@ -589,7 +589,7 @@ Widget buildSettings(
       },
     );
 
-printFullText(String text) {
-  final pattern = RegExp('.{1,800}');
-  pattern.allMatches(text).forEach((element) => print(element.group(0)));
-}
+// printFullText(String text) {
+//   final pattern = RegExp('.{1,800}');
+//   pattern.allMatches(text).forEach((element) => print(element.group(0)));
+// }
