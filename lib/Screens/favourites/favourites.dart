@@ -12,8 +12,8 @@ class FavouriteScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ShoppingCubit, ShoppingState>(builder: (context, state) {
-      List<FavoritesData>? data =
-          ShoppingCubit.get(context).favoriteProductsModel?.data?.data;
+      List<FavoritesData> data =
+          ShoppingCubit.get(context).favoriteProductsModel.data.data;
       return ConditionalBuilder(
         condition: state is! ShopGetFavLoadingState,
         builder: (context) => favoriteBuilder(data, context),

@@ -58,6 +58,7 @@ Widget defaultFormField(
   bool hidden = false,
   Function()? function,
   IconData? suffixIcon,
+  void Function(String value)? submit,
 }) =>
     SizedBox(
       width: 400,
@@ -65,6 +66,7 @@ Widget defaultFormField(
           controller: controller,
           keyboardType: type,
           obscureText: hidden,
+          onFieldSubmitted: submit,
           decoration: InputDecoration(
               labelText: label,
               border: const OutlineInputBorder(),
@@ -84,7 +86,7 @@ Widget defaultTextButton({
       onPressed: function,
       child: Text(
         text,
-        style: const TextStyle(fontSize: 15),
+        style: const TextStyle(fontSize: 13),
         textAlign: TextAlign.center,
       ),
     );
@@ -128,14 +130,14 @@ void signOut(context) {
 //Products Screen
 
 Widget productsBuilder(
-        HomeModel? model, CategoriesModel? categoriesModel, context) =>
+        HomeModel model, CategoriesModel categoriesModel, context) =>
     SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CarouselSlider(
-            items: model?.data?.banners
+            items: model.data.banners
                 .map(
                   (e) => Image(
                     image: NetworkImage(e.image),
@@ -181,10 +183,10 @@ Widget productsBuilder(
                     scrollDirection: Axis.horizontal,
                     physics: const BouncingScrollPhysics(),
                     itemBuilder: (context, index) =>
-                        buildCategoryItem(categoriesModel?.data?.data[index]),
+                        buildCategoryItem(categoriesModel.data!.data[index]),
                     separatorBuilder: (context, index) =>
                         const SizedBox(width: 10),
-                    itemCount: categoriesModel?.data?.data.length ?? 0,
+                    itemCount: categoriesModel.data?.data.length ?? 0,
                   ),
                 ),
                 const SizedBox(
@@ -207,12 +209,12 @@ Widget productsBuilder(
               shrinkWrap: true,
               mainAxisSpacing: 1.0,
               crossAxisSpacing: 1.0,
-              childAspectRatio: 1 / 1.58,
+              childAspectRatio: 1 / 1.70,
               physics: const NeverScrollableScrollPhysics(),
               children: List.generate(
-                model?.data?.products.length ?? 0,
+                model.data.products.length,
                 (index) =>
-                    buildGridProduct(model?.data!.products[index], context),
+                    buildGridProduct(model.data.products[index], context),
               ),
             ),
           )
@@ -220,7 +222,7 @@ Widget productsBuilder(
       ),
     );
 
-Widget buildGridProduct(ProductModel? productModel, context) => Container(
+Widget buildGridProduct(ProductModel productModel, context) => Container(
       color: Colors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -229,7 +231,7 @@ Widget buildGridProduct(ProductModel? productModel, context) => Container(
             alignment: AlignmentDirectional.bottomStart,
             children: [
               Image(
-                image: NetworkImage(productModel!.image),
+                image: NetworkImage(productModel.image),
                 width: double.infinity,
                 height: 200,
               ),
@@ -307,11 +309,11 @@ Widget buildGridProduct(ProductModel? productModel, context) => Container(
       ),
     );
 
-Widget buildCategoryItem(DataModel? data) => Stack(
+Widget buildCategoryItem(DataModel data) => Stack(
       alignment: AlignmentDirectional.bottomCenter,
       children: [
         Image(
-          image: NetworkImage(data!.image),
+          image: NetworkImage(data.image),
           width: 100,
           height: 100,
           fit: BoxFit.cover,
@@ -364,16 +366,17 @@ Widget buildCategoryScreenItem(DataModel? data) => Padding(
 
 //Favorite screen
 
-Widget favoriteBuilder(List<FavoritesData>? data, context) =>
+Widget favoriteBuilder(data, context, {bool isOldPrice = true}) =>
     ListView.separated(
       physics: const BouncingScrollPhysics(),
-      itemBuilder: (context, index) => buildFavoriteItem(data![index], context),
+      itemBuilder: (context, index) => buildFavoriteItem(data[index], context),
       separatorBuilder: (context, index) =>
           const Divider(), //const SizedBox(height: 20),
-      itemCount: data?.length ?? 0,
+      itemCount: data.length,
     );
 
-Widget buildFavoriteItem(FavoritesData data, context) => Padding(
+Widget buildFavoriteItem(Product data, context, {bool isOldPrice = true}) =>
+    Padding(
       padding: const EdgeInsets.all(20.0),
       child: SizedBox(
         height: 120,
@@ -383,12 +386,12 @@ Widget buildFavoriteItem(FavoritesData data, context) => Padding(
               alignment: AlignmentDirectional.bottomStart,
               children: [
                 Image(
-                  image: NetworkImage(data.product!.image),
+                  image: NetworkImage(data.image),
                   width: 120,
                   height: 120,
                   fit: BoxFit.cover,
                 ),
-                if (data.product!.discount != 0)
+                if (data.discount != 0 && isOldPrice)
                   Container(
                     color: Colors.red,
                     padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -407,7 +410,7 @@ Widget buildFavoriteItem(FavoritesData data, context) => Padding(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    data.product!.name,
+                    data.name,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(height: 1.3),
@@ -416,7 +419,7 @@ Widget buildFavoriteItem(FavoritesData data, context) => Padding(
                   Row(
                     children: [
                       Text(
-                        '${data.product!.price}',
+                        '${data.price}',
                         style: TextStyle(
                           fontSize: 12,
                           color: defaultColor,
@@ -426,9 +429,9 @@ Widget buildFavoriteItem(FavoritesData data, context) => Padding(
                       const SizedBox(
                         width: 5,
                       ),
-                      if (data.product!.discount != 0)
+                      if (data.discount != 0 && isOldPrice)
                         Text(
-                          '${data.product!.oldPrice}',
+                          '${data.oldPrice}',
                           style: const TextStyle(
                               fontSize: 12,
                               color: Colors.grey,
@@ -441,15 +444,12 @@ Widget buildFavoriteItem(FavoritesData data, context) => Padding(
                           return IconButton(
                             onPressed: () {
                               ShoppingCubit.get(context)
-                                  .changeFavourite(data.product!.id);
+                                  .changeFavourite(data.id);
                             },
                             icon: CircleAvatar(
                               backgroundColor: ShoppingCubit.get(context)
-                                              .favourites[data.product!.id] !=
-                                          null &&
-                                      ShoppingCubit.get(context)
-                                              .favourites[data.product!.id] !=
-                                          false
+                                          .favourites[data.id] ??
+                                      false
                                   ? defaultColor
                                   : Colors.grey,
                               radius: 15,
@@ -471,7 +471,7 @@ Widget buildFavoriteItem(FavoritesData data, context) => Padding(
       ),
     );
 
-// Settings Screen
+// Profile Screen
 
 Widget buildSettings(
   context,
@@ -575,11 +575,12 @@ Widget buildSettings(
                       text: 'Update Profile'),
                   const SizedBox(height: 30),
                   defaultButton(
-                      function: () {
-                        signOut(context);
-                      },
-                      color: Colors.deepOrange,
-                      text: 'Log Out')
+                    function: () {
+                      signOut(context);
+                    },
+                    color: Colors.grey.shade600,
+                    text: 'Log Out',
+                  )
                 ],
               ),
             ),

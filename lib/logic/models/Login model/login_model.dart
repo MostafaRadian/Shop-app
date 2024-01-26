@@ -1,33 +1,29 @@
 class UserModel {
-  late bool status;
-  late String message;
-  late UserData? data;
+  bool status = false;
+  String message = '';
+  UserData data = UserData();
+
+  UserModel();
   UserModel.fromJson(Map<String, dynamic> json) {
-    status = json['status'];
+    status = json['status'] ?? false;
     message = json['message'] ?? '';
-    data = json['data'] != null ? UserData.fromJson(data: json['data']) : null;
+    data = json['data'] != null
+        ? UserData.fromJson(data: json['data'])
+        : UserData();
   }
 }
 
 class UserData {
-  late int id;
-  late String name;
-  late String email;
-  late String phone;
-  late String image;
-  late String token;
-  int? points;
-  int? credit;
-  UserData({
-    required this.id,
-    required this.name,
-    required this.email,
-    required this.phone,
-    required this.image,
-    required this.token,
-    this.credit,
-    this.points,
-  });
+  int id = 0;
+  String name = '';
+  String email = '';
+  String phone = '';
+  String image = '';
+  String token = '';
+  int points = 0;
+  int credit = 0;
+
+  UserData();
 
   UserData.fromJson({required Map<String, dynamic> data}) {
     id = data['id'] ?? 0;

@@ -16,13 +16,13 @@ class ProfileScreen extends StatelessWidget {
     return BlocConsumer<ShoppingCubit, ShoppingState>(
       listener: (BuildContext context, ShoppingState state) {},
       builder: (BuildContext context, ShoppingState state) {
-        var userData = ShoppingCubit.get(context).userDataModel?.data;
-        nameController.text = userData?.name ?? '';
-        emailController.text = userData?.email ?? '';
-        phoneController.text = userData?.phone ?? '';
+        var userData = ShoppingCubit.get(context).userDataModel.data;
+        nameController.text = userData.name;
+        emailController.text = userData.email;
+        phoneController.text = userData.phone;
 
         return ConditionalBuilder(
-          condition: userData != null,
+          condition: state is! ShopGetUserDataLoadingState,
           builder: (context) => buildSettings(
             context,
             userData,

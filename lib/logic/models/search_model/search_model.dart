@@ -1,9 +1,9 @@
-class FavoriteProductsModel {
+class SearchModel {
   bool status = false;
   Data data = Data();
-  FavoriteProductsModel();
+  SearchModel();
 
-  FavoriteProductsModel.fromJson(Map<String, dynamic> json) {
+  SearchModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
     data = json['data'] != null ? Data.fromJson(json['data']) : Data();
   }
@@ -12,7 +12,7 @@ class FavoriteProductsModel {
 class Data {
   Data();
   int currentPage = 0;
-  List<FavoritesData> data = [];
+  List<Product> data = [];
   String firstPageUrl = '';
   int from = 0;
   int lastPage = 0;
@@ -41,21 +41,10 @@ class Data {
       data = [];
       json['data'].forEach(
         (element) {
-          data.add(FavoritesData.fromJson(element));
+          data.add(Product.fromJson(element));
         },
       );
     }
-  }
-}
-
-class FavoritesData {
-  int id = 0;
-  Product product = Product();
-
-  FavoritesData.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    product =
-        json['product'] != null ? Product.fromJson(json['product']) : Product();
   }
 }
 

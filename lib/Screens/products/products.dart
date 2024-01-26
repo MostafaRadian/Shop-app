@@ -13,10 +13,9 @@ class ProductScreen extends StatelessWidget {
     return BlocConsumer<ShoppingCubit, ShoppingState>(
       listener: (context, state) {
         if (state is ShopChangeFavState) {
-          bool isFav =
-              ShoppingCubit.get(context).simpleFavoriteModel?.status ?? false;
+          bool isFav = ShoppingCubit.get(context).simpleFavoriteModel.status;
           String message =
-              ShoppingCubit.get(context).simpleFavoriteModel?.message ?? '';
+              ShoppingCubit.get(context).simpleFavoriteModel.message;
           if (!isFav) {
             showToast(message: message, state: ToastStates.error);
           }
@@ -24,8 +23,8 @@ class ProductScreen extends StatelessWidget {
       },
       builder: (context, state) {
         return ConditionalBuilder(
-          condition: ShoppingCubit.get(context).homeModel?.status == true &&
-              ShoppingCubit.get(context).categoriesModel?.status == true,
+          condition: ShoppingCubit.get(context).homeModel.status == true &&
+              ShoppingCubit.get(context).categoriesModel.status == true,
           builder: (context) => productsBuilder(
               ShoppingCubit.get(context).homeModel,
               ShoppingCubit.get(context).categoriesModel,

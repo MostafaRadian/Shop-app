@@ -137,7 +137,7 @@ class Login extends StatelessWidget {
                           );
                           CacheHelper.saveData(
                             key: 'token',
-                            value: mod.data?.token,
+                            value: mod.data.token,
                           ).then(
                             (value) {
                               token = CacheHelper.getData(key: 'token');
