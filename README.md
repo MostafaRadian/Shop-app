@@ -9,7 +9,6 @@ Welcome to my Flutter-based Shop App! This mobile application is designed to pro
 - **API Integration**: Access the latest product data through seamless integration with external APIs.
 - **Shopping Cart**: Easily add, remove, and manage items in your shopping cart.
 - **User Authentication**: Secure your account with user authentication features.
-- **Order Tracking**: Keep track of your orders with real-time status updates.
 
 ## Getting Started:
 
